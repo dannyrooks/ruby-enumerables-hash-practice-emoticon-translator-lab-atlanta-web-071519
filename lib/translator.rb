@@ -1,36 +1,38 @@
-# # require modules here
 
-# def load_library
-#   # code goes here
-# end
+require "yaml"
+def load_library(yaml_file)
+  emoticons = YAML.load_file(yaml_file)
+  value = Hash.new
+  value["get_emoticon"]= Hash.new 
+  value["get_meaning"]= Hash.new
+      #value={"get_emoticon" => {}, "get_meaning"=>{}}
+  emoticons.map do |definition, faces|
+    american_emoticons = faces[0]
+    japanese_emoticons = faces[1]
+    value["get_meaning"][japanese_emoticons] = definition
+    value["get_emoticon"][american_emoticons] = japanese_emoticons
+  end
+  return value
+end
 
-# def get_japanese_emoticon
-#   # code goes here
-# end
+def get_japanese_emoticon(yaml_file, emoticons)
+  load_library(yaml_file).map do |get_definition, hashes|
+    hashes.map do |american_emoticons, japanese_emoticons|
+      if emoticons == american_emoticons
+        return japanese_emoticons
+      end
+    end
+  end
+  japanese_emoticons ||= "Sorry, that emoticon was not found"
+end
 
-# def get_english_meaning
-#   # code goes here
-# end
-
-# def load_library(emoticon_file)
-#   emoticons = YAML.load_file('./lib/emoticons.yml')
-#   emoticon_lib = {'get_meaning' => {}, 'get_emoticon' => {} }
-#   emoticons.each do |meaning, value|
-#     english = value[0]
-#     japanese = value[1]
-#     emoticon_lib['get_meaning'][japanese] = meaning
-#     emoticon_lib['get_emoticon'][english] = japanese
-# end
-# # emoticon_lib
-
-# def get_japanese_emoticon(emoticon_file, emoticon)
-#   emoticon_lib = load_library(emoticon_file)
-#   japanese_emoticon = emoticon_lib['get_emoticon'][emoticon]
-#   japanese_emoticon ? japanese_emoticon : 'Sorry, that emoticon was not found'
-# end
-
-# def get_english_meaning(emoticon_file, emoticon)
-#   emoticon_lib = load_library(emoticon_file)
-#   english_meaning = emoticon_lib['get_meaning'][emoticon]
-#   english_meaning ? english_meaning : 'Sorry, that emoticon was not found'
-# end
+def get_english_meaning(yaml_file, emoticons)
+  load_library(yaml_file).map do |get_definition, hashes|
+    hashes.map do |japanese_emoticons, english_meaning|
+      if emoticons == japanese_emoticons
+        return english_meaning
+      end
+    end
+  end
+  english_meaning ||= "Sorry, that emoticon was not found"
+end
